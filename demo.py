@@ -8,6 +8,7 @@ import sys
 import time
 import random
 sys.path.append('./')
+tf.compat.v1.enable_resource_variables()
 
 from nets import txtbox_384, np_methods, txtbox_768
 from processing import ssd_vgg_preprocessing

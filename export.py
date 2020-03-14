@@ -1,5 +1,6 @@
 if __name__ == "__main__":
     import sys
+    import tensorflow as tf
     try:
         export_dir = sys.argv[1]
     except IndexError:
