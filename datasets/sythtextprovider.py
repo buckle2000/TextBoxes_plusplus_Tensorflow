@@ -27,29 +27,29 @@ def get_datasets(data_dir,file_pattern = '*.tfrecord'):
     #num_samples = 288688
     #num_samples = 858750 only for synth datasets
     for file_path in file_path_list:
-        for record in tf.python_io.tf_record_iterator(file_path):
+        for record in tf.compat.v1.python_io.tf_record_iterator(file_path):
             num_samples += 1
     print('num_samples:', num_samples) 
-    reader = tf.TFRecordReader
+    reader = tf.compat.v1.TFRecordReader
     keys_to_features = {
-        'image/encoded': tf.FixedLenFeature((), tf.string, default_value=''),
-        'image/format': tf.FixedLenFeature((), tf.string, default_value='jpeg'),
-        'image/filename': tf.FixedLenFeature((), tf.string, default_value=''),
-        'image/shape': tf.FixedLenFeature([3], tf.int64),
-        'image/object/bbox/xmin': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ymin': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/xmax': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ymax': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x1': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x2': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x3': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x4': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y1': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y2': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y3': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y4': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ignored': tf.VarLenFeature(dtype=tf.int64),
-        'image/object/bbox/label': tf.VarLenFeature(dtype=tf.int64),
+        'image/encoded': tf.io.FixedLenFeature((), tf.string, default_value=''),
+        'image/format': tf.io.FixedLenFeature((), tf.string, default_value='jpeg'),
+        'image/filename': tf.io.FixedLenFeature((), tf.string, default_value=''),
+        'image/shape': tf.io.FixedLenFeature([3], tf.int64),
+        'image/object/bbox/xmin': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ymin': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/xmax': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ymax': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x1': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x2': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x3': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x4': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y1': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y2': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y3': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y4': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ignored': tf.io.VarLenFeature(dtype=tf.int64),
+        'image/object/bbox/label': tf.io.VarLenFeature(dtype=tf.int64),
     }
 
     items_to_handlers = {

@@ -59,18 +59,18 @@ class TextboxesDetection(object):
         self.save_eval_resut_path = save_res_path
         self.model_path = None
 
-        self.config = tf.ConfigProto(allow_soft_placement=True)
+        self.config = tf.compat.v1.ConfigProto(allow_soft_placement=True)
         self.config.gpu_options.allow_growth = True
 
         self.graph = tf.Graph()
-        self.session_text = tf.Session(graph=self.graph, config=self.config)
+        self.session_text = tf.compat.v1.Session(graph=self.graph, config=self.config)
 
         with self.session_text.as_default():
             with self.graph.as_default():
-                self.img_text = tf.placeholder(
+                self.img_text = tf.compat.v1.placeholder(
                     tf.float32, shape=(None, None, 3))
                 print(len(self.text_scales))
-                self.scale_text = tf.placeholder(tf.int32, shape=(2))
+                self.scale_text = tf.compat.v1.placeholder(tf.int32, shape=(2))
 
                 img_pre_text, label_pre_text, bboxes_pre_text, self.bboxes_img_text, xs_text, ys_text = ssd_vgg_preprocessing.preprocess_for_eval(
                     self.img_text,
@@ -90,9 +90,9 @@ class TextboxesDetection(object):
                     self.predictions_text, self.localisations_text, self.logits_text, self.endpoints_text, self.l_shape = self.net_text.net(
                         self.image_text_4d,
                         is_training=False,
-                        reuse=tf.AUTO_REUSE,
+                        reuse=tf.compat.v1.AUTO_REUSE,
                         update_feat_shapes=True)
-                saver_text = tf.train.Saver()
+                saver_text = tf.compat.v1.train.Saver()
                 if os.path.isdir(model_dir):
                     ckpt_path = tf.train.latest_checkpoint(model_dir)
                     self.model_path = os.path.join(model_dir, ckpt_path)

@@ -6,17 +6,23 @@ And many functions are modified based on [SSD-tensorflow project](https://github
 Author:
 	Zhisheng Zou zzsshun13@gmail.com
 
-# pretrained model 
+## What has changed in comparison to the original repo
+
+- You can now export the model to `tf.saved_model` format with `export.py`. The code quality of the original author is really horrible.
+- You can now use `pipenv` to install dependencies. It's slow nonetheless.
+- Increase compatibility with `tf_upgrade_v2`.
+
+## pretrained model 
 1. [Google drive](https://drive.google.com/open?id=1kkRyVrx9iFtwEar6OJBKWNVyTLSYsF28)
 
-# environment
+## environment
 ` python2.7/python3.5 ` 
 
 `tensorflow-gpu 1.8.0`
 
 `at least one gpu`
 
-# how to use
+## how to use
 
 1. Getting the  xml file like this [example xml](./demo/example/image0.xml) and put the image together because we need the format like this [standard xml](./demo/example/standard.xml)
    1. picture format: *.png or *.PNG
@@ -47,6 +53,6 @@ Author:
 
 
 
-# Note:
+## Note:
 
 1. when you are training the model, you can run the eval_result.py to eval your model and save the result

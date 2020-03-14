@@ -30,4 +30,4 @@ def  main(_):
     xml_to_tfrecords.run(FLAGS.xml_img_txt_path, FLAGS.output_dir, FLAGS.output_name, FLAGS.samples_per_files)
 
 if __name__ == '__main__':
-    tf.app.run()
+    tf.compat.v1.app.run()

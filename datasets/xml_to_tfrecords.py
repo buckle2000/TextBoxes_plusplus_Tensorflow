@@ -28,7 +28,7 @@ def _process_image(train_img_path, train_xml_path, name):
     """
     # Read the image file.
 
-    image_data = tf.gfile.FastGFile(train_img_path, 'rb').read()
+    image_data = tf.compat.v1.gfile.FastGFile(train_img_path, 'rb').read()
 
     tree = ET.parse(train_xml_path)
     root = tree.getroot()
@@ -201,8 +201,8 @@ def run(xml_img_txt_path, output_dir, name='icdar15_annotated_data', samples_per
 	  output_dir: Output directory.
 	"""
 
-    if not tf.gfile.Exists(output_dir):
-        tf.gfile.MakeDirs(output_dir)
+    if not tf.io.gfile.exists(output_dir):
+        tf.io.gfile.makedirs(output_dir)
 
     train_txt = open(xml_img_txt_path, 'r')
     lines = train_txt.readlines()
@@ -230,7 +230,7 @@ def run(xml_img_txt_path, output_dir, name='icdar15_annotated_data', samples_per
         #Open new TFRecord file.
         tf_filename = _get_output_filename(output_dir, name, fidx)
 
-        with tf.python_io.TFRecordWriter(tf_filename) as tfrecord_writer:
+        with tf.io.TFRecordWriter(tf_filename) as tfrecord_writer:
             j = 0
             while i < len(filenames) and j < samples_per_files:
                 sys.stdout.write('\r>> Converting image %d/%d' % (i+1, len(filenames)))

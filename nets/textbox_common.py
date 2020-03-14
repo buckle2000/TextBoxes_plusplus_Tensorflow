@@ -95,7 +95,7 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
         inter_vol = h * w
         union_vol = vol_anchors - inter_vol \
             + (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
-        jaccard = tf.div(inter_vol, union_vol)
+        jaccard = tf.compat.v1.div(inter_vol, union_vol)
         return jaccard
 
 
@@ -110,7 +110,7 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
         h = tf.maximum(int_ymax - int_ymin, 0.)
         w = tf.maximum(int_xmax - int_xmin, 0.)
         inter_vol = h * w
-        scores = tf.div(inter_vol, vol_anchors)
+        scores = tf.compat.v1.div(inter_vol, vol_anchors)
         return scores
 
     def condition(i,feat_labels, feat_scores,
@@ -120,7 +120,7 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
         """Condition: check label index.
         """
 
-        r = tf.less(i, tf.shape(glabels)[0])
+        r = tf.less(i, tf.shape(input=glabels)[0])
 
         return r
 
@@ -152,7 +152,7 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
         fmask = tf.cast(mask, dtype)
         # Update values using mask.
         feat_labels = imask * label + (1 - imask) * feat_labels
-        feat_scores = tf.where(mask, jaccard, feat_scores)
+        feat_scores = tf.compat.v1.where(mask, jaccard, feat_scores)
         # bbox ymin xmin ymax xmax gxs gys
         # update all box
         # bbox = tf.Print(bbox, [tf.shape(bbox), bbox], message= ' bbox : ', summarize=20)
@@ -201,8 +201,8 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
      feat_ymin, feat_xmin,
      feat_ymax, feat_xmax,
      feat_x1, feat_x2, feat_x3, feat_x4,
-     feat_y1, feat_y2, feat_y3, feat_y4] = tf.while_loop(condition, body,
-                                           [i, feat_labels, feat_scores,
+     feat_y1, feat_y2, feat_y3, feat_y4] = tf.while_loop(cond=condition, body=body,
+                                           loop_vars=[i, feat_labels, feat_scores,
                                             feat_ymin, feat_xmin,
                                             feat_ymax, feat_xmax, feat_x1, feat_x2, feat_x3, feat_x4, feat_y1, feat_y2, feat_y3, feat_y4])
     # Transform to center / size.
@@ -245,8 +245,8 @@ def tf_text_bboxes_encode_layer(glabels, bboxes,gxs , gys,
     feat_xmin = (feat_cx - xref) / wref / prior_scaling[0]
 
 
-    feat_ymax = tf.log(feat_h / href) / prior_scaling[3]
-    feat_xmax = tf.log(feat_w / wref) / prior_scaling[2]
+    feat_ymax = tf.math.log(feat_h / href) / prior_scaling[3]
+    feat_xmax = tf.math.log(feat_w / wref) / prior_scaling[2]
 
 
     feat_x1 = (feat_x1 - xmin) / wref / prior_scaling[0]
@@ -292,12 +292,12 @@ def tf_text_bboxes_encode(glabels, bboxes,
         Each element is a list of target Tensors.
     """
 
-    with tf.name_scope('text_bboxes_encode'):
+    with tf.compat.v1.name_scope('text_bboxes_encode'):
         target_labels = []
         target_localizations = []
         target_scores = []
         for i, anchors_layer in enumerate(anchors):
-            with tf.name_scope('bboxes_encode_block_%i' % i):
+            with tf.compat.v1.name_scope('bboxes_encode_block_%i' % i):
                 t_label, t_loc, t_scores = \
                     tf_text_bboxes_encode_layer(glabels, bboxes,gxs, gys, anchors_layer,
                                                 matching_threshold,

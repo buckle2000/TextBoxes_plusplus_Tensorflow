@@ -34,16 +34,16 @@ def plt_bboxes(img, classes, scores, bboxes, figsize=(10,10), linewidth=1.5):
             img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 0, 0))
     return img
 
-gpu_options = tf.GPUOptions(allow_growth=False, per_process_gpu_memory_fraction=0.3)
+gpu_options = tf.compat.v1.GPUOptions(allow_growth=False, per_process_gpu_memory_fraction=0.3)
 
-config = tf.ConfigProto(log_device_placement=False, gpu_options=gpu_options)
-isess = tf.Session(config=config) 
+config = tf.compat.v1.ConfigProto(log_device_placement=False, gpu_options=gpu_options)
+isess = tf.compat.v1.Session(config=config) 
 
 # Input placeholder.
 net_shape = (384, 384)
 #net_shape = (768, 768)
 data_format = 'NHWC'
-img_input = tf.placeholder(tf.float32, shape=(None, None, 3))
+img_input = tf.compat.v1.placeholder(tf.float32, shape=(None, None, 3))
 # Evaluation pre-processing: resize to SSD net shape.
 image_pre, labels_pre, bboxes_pre, bbox_img, xs, ys = ssd_vgg_preprocessing.preprocess_for_eval(
     img_input, None, None,None, None, net_shape, data_format, resize=ssd_vgg_preprocessing.Resize.WARP_RESIZE)
@@ -61,14 +61,18 @@ with slim.arg_scope(txt_net.arg_scope(data_format=data_format)):
 
 ckpt_dir = 'model'
 
-isess.run(tf.global_variables_initializer())
+isess.run(tf.compat.v1.global_variables_initializer())
 
-saver = tf.train.Saver()
+saver = tf.compat.v1.train.Saver()
 
 ckpt_filename = tf.train.latest_checkpoint(ckpt_dir)
 if ckpt_dir and ckpt_filename:
     print('checkpoint:',ckpt_dir, os.getcwd(), ckpt_filename)
     saver.restore(isess, ckpt_filename)
+else:
+    raise ('no ckpt')
+
+def demo():
     txt_anchors = txt_net.anchors(net_shape)
 
     def process_image(img, select_threshold=0.01, nms_threshold=.45, net_shape=net_shape):
@@ -107,6 +111,35 @@ if ckpt_dir and ckpt_filename:
     img_with_bbox = plt_bboxes(img_cp, rclasses, rscores, rbboxes)
     cv2.imwrite(os.path.join(path,'demo_res.png'), img_with_bbox)
     print('detection finished')
-else:
-    raise ('no ckpt')
 
+
+def export_model(export_dir):
+    bti = tf.compat.v1.saved_model.utils.build_tensor_info
+    model_def = tf.compat.v1.saved_model.build_signature_def(
+        inputs={
+            'image': bti(img_input)
+        }, 
+        outputs={
+            'prediction_0': bti(predictions[0]),
+            'prediction_1': bti(predictions[1]),
+            'prediction_2': bti(predictions[2]),
+            'prediction_3': bti(predictions[3]),
+            'prediction_4': bti(predictions[4]),
+            'prediction_5': bti(predictions[5]),
+            'localisation_0': bti(localisations[0]),
+            'localisation_1': bti(localisations[1]),
+            'localisation_2': bti(localisations[2]),
+            'localisation_3': bti(localisations[3]),
+            'localisation_4': bti(localisations[4]),
+            'localisation_5': bti(localisations[5]),
+            'bbox': bti(bbox_img),
+        },
+        method_name='predict',
+    )
+    builder = tf.compat.v1.saved_model.Builder(export_dir)
+    builder.add_meta_graph_and_variables(isess, [tf.saved_model.SERVING], {tf.saved_model.DEFAULT_SERVING_SIGNATURE_DEF_KEY:model_def})
+    builder.save()
+
+
+if __name__ == "__main__":
+    demo()

@@ -90,26 +90,26 @@ def get_split(split_name, dataset_dir, file_pattern, num_samples, reader=None):
         file_pattern = util.io.join_path(dataset_dir, file_pattern)
     # Allowing None in the signature so that dataset_factory can use the default.
     if reader is None:
-        reader = tf.TFRecordReader
+        reader = tf.compat.v1.TFRecordReader
     keys_to_features = {
-        'image/encoded': tf.FixedLenFeature((), tf.string, default_value=''),
-        'image/format': tf.FixedLenFeature((), tf.string, default_value='jpeg'),
-        'image/filename': tf.FixedLenFeature((), tf.string, default_value=''),
-        'image/shape': tf.FixedLenFeature([3], tf.int64),
-        'image/object/bbox/xmin': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ymin': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/xmax': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ymax': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x1': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x2': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x3': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/x4': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y1': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y2': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y3': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/y4': tf.VarLenFeature(dtype=tf.float32),
-        'image/object/bbox/ignored': tf.VarLenFeature(dtype=tf.int64),
-        'image/object/bbox/label': tf.VarLenFeature(dtype=tf.int64),
+        'image/encoded': tf.io.FixedLenFeature((), tf.string, default_value=''),
+        'image/format': tf.io.FixedLenFeature((), tf.string, default_value='jpeg'),
+        'image/filename': tf.io.FixedLenFeature((), tf.string, default_value=''),
+        'image/shape': tf.io.FixedLenFeature([3], tf.int64),
+        'image/object/bbox/xmin': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ymin': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/xmax': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ymax': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x1': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x2': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x3': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/x4': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y1': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y2': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y3': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/y4': tf.io.VarLenFeature(dtype=tf.float32),
+        'image/object/bbox/ignored': tf.io.VarLenFeature(dtype=tf.int64),
+        'image/object/bbox/label': tf.io.VarLenFeature(dtype=tf.int64),
     }
     items_to_handlers = {
         'image': slim.tfexample_decoder.Image('image/encoded', 'image/format'),
@@ -256,7 +256,7 @@ def cvt_to_tfrecords(output_path , data_path, gt_path, records_per_file = 30000)
     fid = 0
     image_idx = -1
     while image_idx < fetcher.num_images:
-        with tf.python_io.TFRecordWriter(output_path%(fid)) as tfrecord_writer:
+        with tf.io.TFRecordWriter(output_path%(fid)) as tfrecord_writer:
             record_count = 0
             while record_count != records_per_file:
                 image_idx += 1
@@ -271,7 +271,7 @@ def cvt_to_tfrecords(output_path , data_path, gt_path, records_per_file = 30000)
                 image_path, image, txts, rect_bboxes, oriented_bboxes = record
                 labels = len(rect_bboxes) * [1]
                 ignored = len(rect_bboxes) * [0]
-                image_data = tf.gfile.FastGFile(image_path, 'r').read()
+                image_data = tf.compat.v1.gfile.FastGFile(image_path, 'r').read()
                 
                 shape = image.shape
                 image_name = str(util.io.get_filename(image_path).split('.')[0])

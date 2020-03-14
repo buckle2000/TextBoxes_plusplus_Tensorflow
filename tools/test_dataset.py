@@ -10,7 +10,7 @@ from processing import ssd_vgg_preprocessing
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 slim = tf.contrib.slim
 
-tf.logging.set_verbosity(tf.logging.INFO) 
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO) 
 
 show_pic_sum = 10
 save_dir = 'pic_test_dataset'
@@ -84,8 +84,8 @@ def run():
         print('gboxes:',gbboxes)
         
         
-        gxs = tf.transpose(tf.stack([x1,x2,x3,x4])) #shape = (N,4)
-        gys = tf.transpose(tf.stack([y1, y2, y3, y4]))
+        gxs = tf.transpose(a=tf.stack([x1,x2,x3,x4])) #shape = (N,4)
+        gys = tf.transpose(a=tf.stack([y1, y2, y3, y4]))
         
         image = tf.identity(image, 'input_image')
         text_shape = (384, 384)
@@ -101,12 +101,12 @@ def run():
         text_anchors = text_net.anchors(text_shape)
         e_localisations, e_scores, e_labels = text_net.bboxes_encode( glabels, gbboxes, text_anchors, gxs, gys)
     
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.7)
+    gpu_options = tf.compat.v1.GPUOptions(per_process_gpu_memory_fraction=0.7)
 
-    config = tf.ConfigProto(log_device_placement=False, gpu_options=gpu_options, allow_soft_placement=True)
-    with tf.Session(config=config) as sess:
+    config = tf.compat.v1.ConfigProto(log_device_placement=False, gpu_options=gpu_options, allow_soft_placement=True)
+    with tf.compat.v1.Session(config=config) as sess:
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess, coord)
+        threads = tf.compat.v1.train.start_queue_runners(sess, coord)
         j = 0
         all_time = 0
         try:
