@@ -10,15 +10,24 @@ _model = tf.saved_model.load(resource_filename(__name__, 'saved_model'), tags=[t
 _predict = _model.signatures[tf.saved_model.DEFAULT_SERVING_SIGNATURE_DEF_KEY]
 _txt_anchors = pickle.load(open(resource_filename(__name__, 'anchors.pickle'), 'rb'))
 
-Result = namedtuple('DetectedInstance', ['cls', 'score', 'bbox'])
-
-def predict(img, select_threshold=0.01, nms_threshold=.45):
+def predict(img, select_threshold=0., nms_threshold=0.):
     """
     Detect scene text
 
-    img     np.ndarray with shape (None, None, 3) and dtype np.float32
-    select_threshold    Only return results with score larger than this number
-    nms_threshold       Threshold of non-maximum selection to bounding boxes
+    Parameters
+    ----------
+    img : np.ndarray with shape (None, None, 3) and dtype np.float32
+
+    select_threshold : Only return results with score larger than this number
+
+    nms_threshold : Threshold of non-maximum selection to bounding boxes
+
+    Returns
+    -------
+    (classes, scores, bboxes) : tuple
+        classes : shape=(N, ) class of objects predicted
+        scores : shape=(N, ) confidence of prediction
+        bboxes : shape=(N, 12) bounding box of objects
     """
     result = _predict(tf.convert_to_tensor(img))
     rbbox_img = result['bbox']
@@ -36,4 +45,4 @@ def predict(img, select_threshold=0.01, nms_threshold=.45):
         rclasses, rscores, rbboxes, nms_threshold=nms_threshold)
     # Resize bboxes to original image shape. Note: useless for Resize.WARP!
     rbboxes = np_methods.bboxes_resize(rbbox_img, rbboxes)
-    return list(map(lambda x: Result(x[0], x[1], tuple(x[2])), zip(rclasses, rscores, rbboxes)))
+    return rclasses, rscores, rbboxes
